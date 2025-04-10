@@ -9,6 +9,7 @@ CREATE DATABASE votre_bdd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 # Installer python-decouple
 
 pip install python-decouple
+pip install transformers diffusers
 
 # Configurer le .env comme ceci
 

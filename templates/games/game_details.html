@@ -1,35 +1,36 @@
+<!-- templates/games/generation_success.html -->
 {% extends "base.html" %}
-{% block title %}Détails du jeu{% endblock %}
+{% block title %}Résultat de la génération{% endblock %}
 {% block content %}
+
+<h3>🎮 Jeu généré avec succès</h3>
+
 <h2>{{ game.title }}</h2>
-<p><strong>Genre :</strong> {{ game.genre }}</p>
-<p><strong>Ambiance :</strong> {{ game.ambiance }}</p>
-<p><strong>Mots-clés :</strong> {{ game.keywords }}</p>
-<p><strong>Références :</strong> {{ game.references }}</p>
-<p><strong>Univers :</strong> {{ game.universe }}</p>
-<p><strong>Scénario :</strong> {{ game.story }}</p>
 
-<h3>🎭 Personnages</h3>
-<ul>
-    {% for character in game.characters.all %}
-        <li><strong>{{ character.name }}</strong> - {{ character.role }}</li>
-    {% endfor %}
-</ul>
-
-<h3>🌍 Lieux</h3>
-<ul>
-    {% for location in game.locations.all %}
-        <li><strong>{{ location.name }}</strong> - {{ location.description }}</li>
-    {% endfor %}
-</ul>
-
-{% if game.image_character %}
-    <h3>🖼️ Illustration du personnage</h3>
-    <img src="{{ game.image_character.url }}" alt="Personnage">
-{% endif %}
 
 {% if game.image_environment %}
-    <h3>🖼️ Illustration de l'environnement</h3>
-    <img src="{{ game.image_environment.url }}" alt="Environnement">
+    <div class="game-illustration">
+        <h3>🖼️ Illustration générée</h3>
+        <img src="{{ game.image_environment.url }}" alt="Image générée">
+    </div>
 {% endif %}
+
+<div class="game-details">
+    <p><strong>Genre :</strong> {{ game.genre }}</p>
+    <p><strong>Ambiance :</strong> {{ game.ambiance }}</p>
+    <p><strong>Mots-clés :</strong> {{ game.keywords }}</p>
+    <p><strong>Références :</strong> {{ game.references }}</p>
+</div>
+
+<div class="game-content">
+    {{ game.universe|safe|linebreaks }}
+</div>
+
+<div class="game-scenario">
+    <h3>📖 Scénario</h3>
+    {{ game.story|safe|linebreaks }}
+</div>
+
+
+<a href="{% url 'dashboard' %}" class="button">Retour au tableau de bord</a>
 {% endblock %}
