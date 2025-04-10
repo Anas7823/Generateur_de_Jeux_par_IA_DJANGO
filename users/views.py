@@ -18,7 +18,7 @@ def signup_view(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user = User.objects.create_user(username=email, email=email, password=password)
+            user = User.objects.create_user(username=form.cleaned_data['pseudonyme'], email=email, password=password)
             user.profile.pseudonyme = form.cleaned_data['pseudonyme']
             user.profile.avatar = form.cleaned_data['avatar']
             user.profile.must_change_password = True
