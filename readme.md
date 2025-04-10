@@ -1,3 +1,7 @@
+# Dans mysql
+
+CREATE DATABASE votre_bdd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 # Activer votre environnement virtuel
 
 .\venv\Script\activate
