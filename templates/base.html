@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}GameForge{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.2/lottie.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <header class="futuristic-header">
+        <div class="navbar-container">
+            <div class="logo">
+                <span class="logo-text">GAME<span class="highlight">FORGE</span></span>
+                <div class="logo-glow"></div>
+            </div>
+            
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <nav class="main-nav" id="mainNav">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="{% url 'profile' %}" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span class="link-text">Accueil</span>
+                            <span class="link-beam"></span>
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a href="{% url 'logout' %}" class="nav-link">
+                            <i class="fas fa-lock-open"></i>
+                            <span class="link-text">Déconnexion</span>
+                            <span class="link-beam"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard' %}" class="nav-link">
+                            <i class="fas fa-lock-open"></i>
+                            <span class="link-text">dashboard</span>
+                            <span class="link-beam"></span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="nav-link">
+                            <i class="fas fa-lock"></i>
+                            <span class="link-text">Connexion</span>
+                            <span class="link-beam"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'signup' %}" class="nav-link">
+                            <i class="fas fa-user-plus"></i>
+                            <span class="link-text">Inscription</span>
+                            <span class="link-beam"></span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a href="{% url 'about' %}" class="nav-link">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="link-text">À propos</span>
+                            <span class="link-beam"></span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="glass-container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+    
+    <script src="{% static 'js/navbar.js' %}"></script>
+</body>
+</html>

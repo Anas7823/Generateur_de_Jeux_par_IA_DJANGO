@@ -1,10 +1,58 @@
-{% extends "users/base.html" %}
+{% extends "base.html" %}
+{% load static %}
 {% block title %}Mon Profil{% endblock %}
 {% block content %}
-<h2>👤 Mon Profil</h2>
-<p><strong>Pseudonyme :</strong> {{ user.profile.pseudonyme }}</p>
-<p><strong>Email :</strong> {{ user.email }}</p>
-<p><strong>Avatar :</strong><br>
-    <img src="{{ user.profile.avatar.url }}" alt="avatar" width="150" class="avatar">
-</p>
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            <h2><i class="fas fa-user-circle"></i> Mon Profil</h2>
+        </div>
+        
+        <div class="profile-content">
+            <div class="profile-avatar">
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="avatar" class="avatar">
+                {% else %}
+                    <img src="/media/avatars/wolfgang-hasselmann-pVr6wvUneMk-unsplash.jpg" alt="avatar par défaut" class="avatar">
+                {% endif %}
+            </div>
+            
+            <div class="profile-details">
+                <div class="profile-info-item">
+                    <div class="profile-info-label">
+                        <i class="fas fa-user-tag"></i> Pseudonyme
+                    </div>
+                    <div class="profile-info-value">
+                        {{ user.profile.pseudonyme }}
+                    </div>
+                </div>
+                
+                <div class="profile-info-item">
+                    <div class="profile-info-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </div>
+                    <div class="profile-info-value">
+                        {{ user.email }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="profile-animation">
+        <div id="lottie-profile"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var animation = lottie.loadAnimation({
+            container: document.getElementById('lottie-profile'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{% static "animations/profile.json" %}'
+        });
+    });
+</script>
 {% endblock %}

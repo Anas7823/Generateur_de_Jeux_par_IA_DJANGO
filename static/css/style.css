@@ -1,37 +1,31 @@
+/* Import des polices */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+
+/* Variables globales */
+:root {
+  --primary-color: #bb86fc;
+  --secondary-color: #03dac6;
+  --bg-dark: #121212;
+  --bg-medium: #1e1e1e;
+  --bg-light: #2c2c2c;
+  --glow-color: rgba(187, 134, 252, 0.7);
+  --accent-color: #cf6679;
+  --text-color: #e0e0e0;
+  --font-main: 'Rajdhani', 'Orbitron', 'Roboto', sans-serif;
+}
+
+/* Base */
 body {
-    font-family: 'Roboto', sans-serif;
-    background: #121212;
-    color: #e0e0e0;
+    font-family: var(--font-main);
+    background: var(--bg-dark);
+    color: var(--text-color);
     margin: 0;
     padding: 0;
 }
 
-nav {
-    background: #1f1f1f;
-    color: #e0e0e0;
-    padding: 15px 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-}
-
-.nav-container {
-    display: flex;
-    justify-content: center;
-    gap: 25px;
-}
-
-.nav-container a {
-    color: #bb86fc;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-.nav-container a:hover {
-    color: #03dac6;
-}
-
+/* Styles du contenu principal */
 main {
-    max-width: 700px;
+    max-width: 900px;
     margin: 40px auto;
     background: #1e1e1e;
     padding: 25px;
@@ -39,6 +33,7 @@ main {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
+/* Formulaires et entrées */
 form {
     display: flex;
     flex-direction: column;
@@ -57,23 +52,32 @@ input, select, textarea, button {
 
 input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: #bb86fc;
-    box-shadow: 0 0 5px #bb86fc;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px var(--primary-color);
 }
 
 button {
-    background: #bb86fc;
+    background: var(--primary-color);
     color: #121212;
     border: none;
     cursor: pointer;
     font-weight: bold;
     transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 button:hover {
-    background: #03dac6;
+    background: var(--secondary-color);
 }
 
+button i {
+    font-size: 1.2em;
+}
+
+/* Messages d'alerte */
 .messages {
     list-style-type: none;
     padding: 0;
@@ -82,21 +86,311 @@ button:hover {
 .messages li {
     padding: 12px;
     margin: 12px 0;
-    border-left: 5px solid #bb86fc;
+    border-left: 5px solid var(--primary-color);
     background: #2c2c2c;
     border-radius: 8px;
 }
 
+/* Styles de lotties et animations */
+.login-container, .profile-container {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.login-form, .profile-info {
+    flex: 1;
+}
+
+.login-animation, .profile-animation {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#lottie-login, #lottie-profile {
+    width: 300px;
+    height: 300px;
+}
+
+/* Style pour la page de connexion */
+.login-container {
+    position: relative;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+/* Séparateur stylisé */
+.login-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.separator-line {
+    height: 60%;
+    width: 2px;
+    background: linear-gradient(to bottom, 
+        rgba(255, 255, 255, 0), 
+        rgba(255, 255, 255, 0.7), 
+        rgba(255, 255, 255, 0));
+    position: relative;
+    margin: 0 15px;
+}
+
+.separator-line::before, 
+.separator-line::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    width: 1px;
+    height: 30vh;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    transform: translateX(-50%);
+}
+
+.separator-line::before {
+    top: 20%;
+}
+
+.separator-line::after {
+    bottom: 20%;
+}
+
+/* Bouton de connexion plus petit */
+.login-button {
+    max-width: 180px;
+    padding: 10px 15px;
+    font-size: 0.95em;
+    border-radius: 25px;
+    box-shadow: 0 4px 10px rgba(187, 134, 252, 0.3);
+    transition: all 0.3s ease;
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(3, 218, 198, 0.4);
+}
+
+/* Avatars */
 .avatar {
     border-radius: 50%;
-    border: 3px solid #bb86fc;
-    margin-top: 15px;
-    width: 150px;
-    height: 150px;
+    border: 4px solid var(--primary-color);
+    width: 180px;
+    height: 180px;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(187, 134, 252, 0.3);
 }
 
 .avatar:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(187, 134, 252, 0.5);
+}
+
+/* Améliorations pour les formulaires */
+form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+form p {
+    margin-bottom: 15px;
+}
+
+.helptext {
+    display: block;
+    font-size: 0.85em;
+    color: var(--primary-color);
+    margin-top: 5px;
+}
+
+/* Styles améliorés pour la page de profil */
+.profile-container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.profile-card {
+    flex: 1;
+    background: #2c2c2c;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.profile-header {
+    padding: 20px;
+    background: var(--bg-medium);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.profile-header h2 {
+    margin: 0;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-content {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.profile-avatar {
+    display: flex;
+    justify-content: center;
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.profile-info-item {
+    display: flex;
+    flex-direction: column;
+    background: #363636;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.profile-info-label {
+    padding: 10px 15px;
+    background: #2c2c2c;
+    color: var(--primary-color);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-info-value {
+    padding: 15px;
+    font-size: 1.1em;
+}
+
+/* Compatibilité avec le glassmorphism */
+.glass-container {
+    background: rgba(30, 30, 30, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(187, 134, 252, 0.3);
+}
+
+/* Particules */
+#particles-js {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    background-color: var(--bg-dark);
+}
+
+/* Styles pour la page À propos */
+.about-container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.about-content {
+    flex: 1;
+    background: #2c2c2c;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    padding: 25px;
+}
+
+.about-content h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 15px;
+}
+
+.about-description {
+    padding-top: 15px;
+}
+
+.about-description ul {
+    margin-left: 20px;
+    color: var(--text-color);
+}
+
+.about-description ul li {
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.about-description ul li:before {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+}
+
+.about-animation {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#lottie-about {
+    width: 100%;
+    max-width: 400px;
+    height: 400px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .profile-container, .login-container, .about-container {
+        flex-direction: column;
+    }
+    
+    #lottie-profile, #lottie-login, #lottie-about {
+        height: 300px;
+    }
+    
+    main {
+        padding: 15px;
+        margin: 20px auto;
+    }
+    
+    button {
+        padding: 10px;
+    }
+    
+    .login-separator {
+        display: none;
+    }
 }

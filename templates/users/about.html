@@ -1,6 +1,36 @@
-{% extends "users/base.html" %}
+{% extends "base.html" %}
+{% load static %}
 {% block title %}À propos{% endblock %}
 {% block content %}
-<h2>ℹ️ À propos de l’application</h2>
-<p>Cette application a été développée pour vous apprendre à créer un système d’authentification robuste avec Django.</p>
+<div class="about-container">
+    <div class="about-content">
+        <h2><i class="fas fa-info-circle"></i> À propos de l'application</h2>
+        <div class="about-description">
+            <p>Cette application a été développée pour vous apprendre à créer un système d'authentification robuste avec Django.</p>
+            <p>GameForge est une plateforme de génération de concepts de jeux vidéo assistée par intelligence artificielle. Elle permet aux utilisateurs de créer des idées de jeux originales en quelques clics.</p>
+            <p>Fonctionnalités principales :</p>
+            <ul>
+                <li>Système d'authentification sécurisé</li>
+                <li>Génération de concepts de jeux par IA</li>
+                <li>Création d'illustrations conceptuelles</li>
+                <li>Sauvegarde et gestion des projets</li>
+            </ul>
+        </div>
+    </div>
+    <div class="about-animation">
+        <div id="lottie-about"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var animation = lottie.loadAnimation({
+            container: document.getElementById('lottie-about'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{% static "animations/about.json" %}'
+        });
+    });
+</script>
 {% endblock %}

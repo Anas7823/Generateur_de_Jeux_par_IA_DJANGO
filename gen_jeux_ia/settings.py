@@ -132,7 +132,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 HUGGINGFACE_API_KEY = config('HUGGINGFACE_API_KEY')
-STABILITY_API_KEY = config('STABILITY_API_KEY')
+# STABILITY_API_KEY = config('STABILITY_API_KEY')
 
 TEXT_GEN_ENDPOINT = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
 IMAGE_GEN_ENDPOINT = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large"
