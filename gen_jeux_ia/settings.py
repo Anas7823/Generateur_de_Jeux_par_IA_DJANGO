@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from decouple import config
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,7 +36,6 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'secureauth.apps.SecureauthConfig',
     'games.apps.GamesConfig',
-    'ai_generation.apps.AiGenerationConfig',
 ]
 
 MIDDLEWARE = [
@@ -127,11 +127,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 HUGGINGFACE_API_KEY = config('HUGGINGFACE_API_KEY')
+STABILITY_API_KEY = config('STABILITY_API_KEY')
+
+TEXT_GEN_ENDPOINT = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
+IMAGE_GEN_ENDPOINT = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
