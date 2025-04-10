@@ -1,0 +1,10 @@
+{% extends "users/base.html" %}
+{% block title %}Mon Profil{% endblock %}
+{% block content %}
+<h2>👤 Mon Profil</h2>
+<p><strong>Pseudonyme :</strong> {{ user.profile.pseudonyme }}</p>
+<p><strong>Email :</strong> {{ user.email }}</p>
+<p><strong>Avatar :</strong><br>
+    <img src="{{ user.profile.avatar.url }}" alt="avatar" width="150" class="avatar">
+</p>
+{% endblock %}

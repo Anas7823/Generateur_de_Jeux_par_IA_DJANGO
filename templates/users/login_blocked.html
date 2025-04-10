@@ -1,0 +1,6 @@
+{% extends "users/base.html" %}
+{% block title %}Accès bloqué{% endblock %}
+{% block content %}
+<h2>⛔ Accès temporairement bloqué</h2>
+<p>Vous avez dépassé le nombre d’essais. Merci de patienter {{ wait_time }} secondes.</p>
+{% endblock %}

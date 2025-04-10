@@ -1,0 +1,14 @@
+{% extends "users/base.html" %}
+{% block title %}Inscription{% endblock %}
+{% block content %}
+<h2>📝 Créer un compte</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <label>Email :</label>
+    <input type="email" name="email" required>
+    <label>Mot de passe :</label>
+    <input type="password" name="password" required>
+    <button type="submit">S’inscrire</button>
+</form>
+{% endblock %}
