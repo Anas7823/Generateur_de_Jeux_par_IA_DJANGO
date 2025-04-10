@@ -1,0 +1,31 @@
+<!-- templates/games/generation_success.html -->
+{% extends "base.html" %}
+{% block title %}Résultat de la génération{% endblock %}
+{% block content %}
+<h2>🎮 Jeu généré avec succès</h2>
+
+<div class="game-details">
+    <p><strong>Genre :</strong> {{ game.genre }}</p>
+    <p><strong>Ambiance :</strong> {{ game.ambiance }}</p>
+    <p><strong>Mots-clés :</strong> {{ game.keywords }}</p>
+    <p><strong>Références :</strong> {{ game.references }}</p>
+</div>
+
+<div class="game-content">
+    {{ game.universe|safe|linebreaks }}
+</div>
+
+<div class="game-scenario">
+    <h3>📖 Scénario</h3>
+    {{ game.story|safe|linebreaks }}
+</div>
+
+{% if game.image_environment %}
+    <div class="game-illustration">
+        <h3>🖼️ Illustration générée</h3>
+        <img src="{{ game.image_environment.url }}" alt="Image générée">
+    </div>
+{% endif %}
+
+<a href="{% url 'dashboard' %}" class="button">Retour au tableau de bord</a>
+{% endblock %}

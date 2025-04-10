@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<h2>🎮 Mes Jeux</h2>
+<a href="{% url 'guided_creation' %}" class="button">➕ Créer un nouveau jeu</a>
+<ul class="game-list">
+    {% for game in games %}
+        <li>
+            <a href="{% url 'game-detail' game.id %}">
+                <strong>{{ game.title }}</strong> - {{ game.genre }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

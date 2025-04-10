@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Détails du jeu{% endblock %}
+{% block content %}
+<h2>{{ game.title }}</h2>
+<p><strong>Genre :</strong> {{ game.genre }}</p>
+<p><strong>Ambiance :</strong> {{ game.ambiance }}</p>
+<p><strong>Mots-clés :</strong> {{ game.keywords }}</p>
+<p><strong>Références :</strong> {{ game.references }}</p>
+<p><strong>Univers :</strong> {{ game.universe }}</p>
+<p><strong>Scénario :</strong> {{ game.story }}</p>
+
+<h3>🎭 Personnages</h3>
+<ul>
+    {% for character in game.characters.all %}
+        <li><strong>{{ character.name }}</strong> - {{ character.role }}</li>
+    {% endfor %}
+</ul>
+
+<h3>🌍 Lieux</h3>
+<ul>
+    {% for location in game.locations.all %}
+        <li><strong>{{ location.name }}</strong> - {{ location.description }}</li>
+    {% endfor %}
+</ul>
+
+{% if game.image_character %}
+    <h3>🖼️ Illustration du personnage</h3>
+    <img src="{{ game.image_character.url }}" alt="Personnage">
+{% endif %}
+
+{% if game.image_environment %}
+    <h3>🖼️ Illustration de l'environnement</h3>
+    <img src="{{ game.image_environment.url }}" alt="Environnement">
+{% endif %}
+{% endblock %}
