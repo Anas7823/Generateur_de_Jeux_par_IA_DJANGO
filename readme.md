@@ -1,3 +1,7 @@
+# Activer votre environnement virtuel
+
+.\venv\Script\activate
+
 # Installer python-decouple
 
 pip install python-decouple
@@ -11,3 +15,12 @@ DB_USER=user_mysql
 DB_PASSWORD=mot_de_passe_mysql
 DB_HOST=Votre_host (localhost ou autre)
 DB_PORT=votre_port
+
+# Faire les migrations
+
+python manage.py makemigration
+python manage.py migrate
+
+# Lancer le projet
+
+python manage.py runserver
