@@ -38,16 +38,26 @@
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a href="{% url 'logout' %}" class="nav-link">
-                            <i class="fas fa-lock-open"></i>
-                            <span class="link-text">Déconnexion</span>
-                            <span class="link-beam"></span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a href="{% url 'dashboard' %}" class="nav-link">
                             <i class="fas fa-lock-open"></i>
                             <span class="link-text">dashboard</span>
+                            <span class="link-beam"></span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a href="{% url 'about' %}" class="nav-link">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="link-text">À propos</span>
+                            <span class="link-beam"></span>
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    
+                    <li class="nav-item">
+                        <a href="{% url 'logout' %}" class="nav-link btn-logout">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <!-- <span class="link-text"></span> -->
                             <span class="link-beam"></span>
                         </a>
                     </li>
@@ -67,13 +77,6 @@
                         </a>
                     </li>
                     {% endif %}
-                    <li class="nav-item">
-                        <a href="{% url 'about' %}" class="nav-link">
-                            <i class="fas fa-info-circle"></i>
-                            <span class="link-text">À propos</span>
-                            <span class="link-beam"></span>
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </div>
