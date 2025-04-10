@@ -66,9 +66,12 @@ def profile_view(request):
 
 @login_required
 def change_password_view(request):
+    print("Début de la fonction change_password_view")
     if request.method == 'POST':
+        print("Méthode POST détectée")
         form = MandatoryPasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
+            print("Formulaire valide")
             user = form.save()
             update_session_auth_hash(request, user)
             profile = request.user.profile
@@ -76,7 +79,10 @@ def change_password_view(request):
             profile.save()
             messages.success(request, "Mot de passe changé avec succès.")
             return redirect('profile')
+        else:
+            print("Formulaire invalide :", form.errors)
     else:
+        print("Méthode GET détectée")
         form = MandatoryPasswordChangeForm(user=request.user)
     return render(request, 'users/change_password.html', {'form': form})
 
