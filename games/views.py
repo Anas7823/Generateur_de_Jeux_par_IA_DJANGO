@@ -10,6 +10,7 @@ from django.core.files.base import ContentFile
 from transformers import pipeline
 from diffusers import DiffusionPipeline
 import random
+from .api_limiter import api_limiter  # Ajouter cette ligne en haut du fichier
 
 
 # API Views
@@ -78,6 +79,14 @@ def generate_image_with_api(prompt):
 @login_required
 def guided_creation_view(request):
     if request.method == 'POST':
+        can_use, wait_time = api_limiter.check_limit(request.META.get('REMOTE_ADDR'))
+        if not can_use:
+            return render(request, 'games/api_limit.html', {
+                'wait_time': wait_time,
+                'cooldown_minutes': api_limiter.cooldown_minutes,
+                'max_attempts': api_limiter.max_attempts
+            })
+
         genre = request.POST.get('genre')
         ambiance = request.POST.get('ambiance')
         keywords = request.POST.get('keywords')
@@ -219,6 +228,14 @@ N'oublie pas : ton objectif est de **faire rêver** un joueur ou un investisseur
 
 @login_required
 def random_game_view(request):
+    # Vérifier la limite d'utilisation
+    can_use, wait_time = api_limiter.check_limit(request.META.get('REMOTE_ADDR'))
+    if not can_use:
+        return render(request, 'games/api_limit.html', {
+            'wait_time': wait_time,
+            'cooldown_minutes': api_limiter.cooldown_minutes,
+            'max_attempts': api_limiter.max_attempts
+        })
     # Générer des valeurs aléatoires pour le jeu
     genres = ["RPG", "FPS", "Aventure", "Simulation", "Stratégie", "Survie"]
     ambiances = ["Fantasy", "Cyberpunk", "Post-apocalyptique", "Horreur", "Science-fiction", "Historique", "Steampunk", "Moderne"]
