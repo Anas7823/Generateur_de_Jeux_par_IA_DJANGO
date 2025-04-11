@@ -39,8 +39,15 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a href="{% url 'dashboard' %}" class="nav-link">
-                            <i class="fas fa-lock-open"></i>
+                            <i class="fas fa-table-cells"></i>
                             <span class="link-text">dashboard</span>
+                            <span class="link-beam"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'favorite-games' %}" class="nav-link">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="link-text">Favoris</span>
                             <span class="link-beam"></span>
                         </a>
                     </li>

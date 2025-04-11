@@ -1,15 +1,556 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Tableau de bord{% endblock %}
 {% block content %}
-<h2>🎮 Mes Jeux</h2>
-<a href="{% url 'guided_creation' %}" class="button">➕ Créer un nouveau jeu</a>
-<ul class="game-list">
-    {% for game in games %}
-        <li>
-            <a href="{% url 'game-detail' game.id %}">
-                <strong>{{ game.title }}</strong> - {{ game.genre }}
+<style>
+/* CSS intégré directement pour le tableau de bord */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+/* Animation Lottie en coin */
+#lottie-controller {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    z-index: 100;
+}
+
+/* Titre principal */
+.title-container {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-top: 20px;
+}
+
+.dashboard-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #ffffff;
+    font-size: 2.8rem;
+    margin: 0;
+    text-align: center;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    display: inline-block;
+}
+
+.title-text {
+    position: relative;
+    display: inline-block;
+    border-right: 4px solid #ffffff;
+    padding-right: 8px;
+    animation: blink-cursor 1s step-end infinite;
+}
+
+@keyframes blink-cursor {
+    from, to { border-color: transparent; }
+    50% { border-color: #ffffff; }
+}
+
+/* Bouton de création amélioré */
+.create-game-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+.create-game-button {
+    background: linear-gradient(45deg, #03dac6, #018786);
+    color: #000000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 15px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(3, 218, 198, 0.4);
+    margin: 0 auto;
+    max-width: 300px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.create-game-button i {
+    font-size: 1.4rem;
+    transition: transform 0.3s ease;
+}
+
+.create-game-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(3, 218, 198, 0.6);
+    background: linear-gradient(45deg, #02c4b0, #016d6b);
+}
+
+.create-game-button:hover i {
+    transform: rotate(90deg);
+}
+
+.button-glow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(3, 218, 198, 0.4) 0%, transparent 70%);
+    top: 0;
+    left: 0;
+    border-radius: 50px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.create-game-button:hover .button-glow {
+    opacity: 1;
+    animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.4; }
+    100% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* Grille de jeux modernisée */
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.game-card {
+    background: linear-gradient(145deg, rgba(40, 40, 50, 0.8), rgba(30, 30, 40, 0.9));
+    border-radius: 16px;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
+    opacity: 0; /* Pour l'animation d'entrée */
+    transform: translateY(50px); /* Pour l'animation d'entrée */
+    display: flex;
+    flex-direction: column;
+    height: 340px;
+}
+
+.game-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #03dac6, #bb86fc);
+    opacity: 0.7;
+    transition: height 0.3s ease;
+    z-index: 2;
+}
+
+.game-card:hover {
+    transform: translateY(-10px);
+    background: linear-gradient(145deg, rgba(50, 50, 65, 0.9), rgba(40, 40, 55, 1));
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(187, 134, 252, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.game-card:hover::before {
+    height: 8px;
+    opacity: 1;
+}
+
+/* Styles pour la miniature d'image */
+.game-image-container {
+    width: 100%;
+    height: 140px;
+    overflow: hidden;
+    border-radius: 16px 16px 0 0;
+    position: relative;
+}
+
+.game-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.game-card:hover .game-image {
+    transform: scale(1.05);
+}
+
+.game-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, #1a1a23, #2d2d35);
+}
+
+.game-image-placeholder i {
+    font-size: 3rem;
+    color: #03dac6;
+    opacity: 0.6;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 15px;
+    position: relative;
+    padding: 20px;
+}
+
+.game-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    margin: 0;
+    color: white;
+    line-height: 1.4;
+    transition: color 0.3s ease;
+}
+
+.game-card:hover .game-title {
+    color: #03dac6;
+}
+
+.game-meta {
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+.game-genre {
+    display: inline-block;
+    background: rgba(3, 218, 198, 0.15);
+    color: #03dac6;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(3, 218, 198, 0.3);
+}
+
+/* Bouton de détails modernisé */
+.view-details-button {
+    background: rgba(187, 134, 252, 0.15);
+    color: #bb86fc;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 30px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(187, 134, 252, 0.3);
+}
+
+.view-details-button i {
+    transition: transform 0.3s ease;
+}
+
+.game-card:hover .view-details-button {
+    background: rgba(187, 134, 252, 0.25);
+    border-color: rgba(187, 134, 252, 0.5);
+}
+
+.game-card:hover .view-details-button i {
+    transform: translateX(5px);
+}
+
+/* Message quand aucun jeu n'est disponible */
+.no-games {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 30px;
+    background: rgba(30, 30, 40, 0.7);
+    border-radius: 16px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.no-games i {
+    font-size: 4.5rem;
+    color: #03dac6;
+    margin-bottom: 25px;
+    display: block;
+    opacity: 0.8;
+}
+
+.no-games p {
+    font-size: 1.3rem;
+    color: #ffffff;
+    line-height: 1.7;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+    .dashboard-title {
+        font-size: 2.2rem;
+    }
+    
+    #lottie-controller {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .game-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 20px;
+    }
+    
+    .game-card {
+        height: 320px;
+    }
+    
+    .game-image-container {
+        height: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-title {
+        font-size: 1.8rem;
+    }
+    
+    #lottie-controller {
+        width: 50px;
+        height: 50px;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .game-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .create-game-button {
+        font-size: 0.95rem;
+        padding: 12px 20px;
+        width: 100%;
+        max-width: none;
+    }
+    
+    .game-card {
+        height: auto;
+        min-height: 300px;
+    }
+}
+
+/* Styles pour le canvas PixiJS */
+#pixi-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+</style>
+
+<div class="dashboard-container">
+    <!-- Animation Lottie en coin -->
+    <div id="lottie-controller"></div>
+    
+    <!-- Titre principal -->
+    <div class="title-container">
+        <h2 id="dashboard-title" class="dashboard-title"><span class="title-text"></span></h2>
+    </div>
+    
+    <!-- Conteneur du bouton de création -->
+    <div class="create-game-container">
+        <a href="{% url 'guided_creation' %}" class="create-game-button">
+            <span class="button-glow"></span>
+            <i class="fas fa-plus-circle"></i> Créer un nouveau jeu
+        </a>
+    </div>
+    
+    <!-- Liste des jeux générés -->
+    <div class="game-grid">
+        {% for game in games %}
+            <a href="{% url 'game-detail' game.id %}" class="game-card">
+                <div class="game-image-container">
+                    {% if game.image_environment %}
+                        <img src="{{ game.image_environment.url }}" alt="{{ game.title }}" class="game-image">
+                    {% else %}
+                        <div class="game-image-placeholder">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-content">
+                    <h3 class="game-title">{{ game.title }}</h3>
+                    <div class="game-meta">
+                        <span class="game-genre">{{ game.genre }}</span>
+                    </div>
+                    <div class="view-details-button">
+                        <span>Voir détails</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
             </a>
-        </li>
-    {% endfor %}
-</ul>
+        {% empty %}
+            <div class="no-games">
+                <i class="fas fa-robot"></i>
+                <p>Vous n'avez pas encore de jeux. Créez votre premier concept maintenant !</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Canvas pour PixiJS -->
+<canvas id="pixi-background"></canvas>
+
+<!-- Scripts externes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.5.2/browser/pixi.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.2/lottie.min.js"></script>
+
+<script>
+    // Initialisation du fond PixiJS
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation Lottie
+        var controllerAnimation = lottie.loadAnimation({
+            container: document.getElementById('lottie-controller'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{% static "animations/manette.json" %}'
+        });
+        
+        // Configuration PixiJS
+        const app = new PIXI.Application({
+            view: document.getElementById('pixi-background'),
+            resizeTo: window,
+            transparent: true,
+            resolution: window.devicePixelRatio || 1,
+        });
+        
+        // Création des particules
+        const particleCount = Math.min(window.innerWidth / 10, 150);
+        const particles = [];
+        const connections = [];
+        const connectionDistance = Math.min(window.innerWidth / 6, 150);
+        
+        // Classe Particule
+        class Particle {
+            constructor() {
+                this.graphics = new PIXI.Graphics();
+                this.graphics.beginFill(0xbb86fc);
+                this.graphics.drawCircle(0, 0, Math.random() * 2 + 1);
+                this.graphics.endFill();
+                
+                this.x = Math.random() * app.screen.width;
+                this.y = Math.random() * app.screen.height;
+                this.vx = Math.random() * 0.4 - 0.2;
+                this.vy = Math.random() * 0.4 - 0.2;
+                
+                this.graphics.x = this.x;
+                this.graphics.y = this.y;
+                this.graphics.alpha = Math.random() * 0.5 + 0.3;
+                
+                app.stage.addChild(this.graphics);
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Rebond sur les bords
+                if (this.x <= 0 || this.x >= app.screen.width) {
+                    this.vx *= -1;
+                }
+                if (this.y <= 0 || this.y >= app.screen.height) {
+                    this.vy *= -1;
+                }
+                
+                this.graphics.x = this.x;
+                this.graphics.y = this.y;
+            }
+        }
+        
+        // Création des particules
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+        
+        // Création des lignes de connexion
+        const connectionGraphics = new PIXI.Graphics();
+        app.stage.addChild(connectionGraphics);
+        
+        // Animation des particules
+        app.ticker.add(() => {
+            for (let i = 0; i < particleCount; i++) {
+                particles[i].update();
+            }
+            
+            connectionGraphics.clear();
+            
+            for (let i = 0; i < particleCount; i++) {
+                for (let j = i + 1; j < particleCount; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < connectionDistance) {
+                        const alpha = 1 - (distance / connectionDistance);
+                        
+                        connectionGraphics.lineStyle(0.5, 0xbb86fc, alpha * 0.25);
+                        connectionGraphics.moveTo(particles[i].x, particles[i].y);
+                        connectionGraphics.lineTo(particles[j].x, particles[j].y);
+                    }
+                }
+            }
+        });
+        
+        const titleText = "Mes Jeux";
+        const titleElement = document.querySelector('.title-text');
+        let i = 0;
+        
+        function typeWriter() {
+            if (i < titleText.length) {
+                titleElement.textContent += titleText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 150);
+            } else {
+                animateCards();
+            }
+        }
+        
+        setTimeout(typeWriter, 500);
+        
+        function animateCards() {
+            anime({
+                targets: '.game-card',
+                translateY: [50, 0],
+                opacity: [0, 1],
+                easing: 'easeOutExpo',
+                duration: 1200,
+                delay: anime.stagger(100)
+            });
+        }
+        
+        window.addEventListener('resize', function() {
+            app.renderer.resize(window.innerWidth, window.innerHeight);
+        });
+    });
+</script>
 {% endblock %}
