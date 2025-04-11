@@ -6,6 +6,7 @@ User = get_user_model()
 class Game(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games')
     title = models.CharField(max_length=100)
+    title = models.TextField()
     genre = models.CharField(max_length=50)
     ambiance = models.TextField()
     keywords = models.TextField()
