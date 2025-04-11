@@ -1,32 +1,519 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Création guidée{% endblock %}
 {% block content %}
-<h2>📝 Créer un jeu</h2>
-<form method="post">
-    {% csrf_token %}
-    <label for="genre">Genre :</label>
-    <input type="text" id="genre" name="genre" placeholder="RPG, FPS, etc." required>
+<!-- Ajout de la bibliothèque Rive -->
+<script src="https://unpkg.com/@rive-app/canvas@2.9.1"></script>
 
-    <label for="ambiance">Ambiance :</label>
-    <input type="text" id="ambiance" name="ambiance" placeholder="Cyberpunk, Fantasy, etc." required>
+<style>
+/* Styles pour la page de création de jeu */
+.creation-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
 
-    <label for="keywords">Mots-clés :</label>
-    <input type="text" id="keywords" name="keywords" placeholder="IA rebelle, vengeance, etc." required>
+.creation-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #ffffff;
+    font-size: 2.5rem;
+    margin: 0 0 30px 0;
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
 
-    <label for="references">Références culturelles :</label>
-    <input type="text" id="references" name="references" placeholder="Zelda, Hollow Knight, etc.">
+.creation-title i {
+    font-size: 2rem;
+    color: #03dac6;
+}
 
-    <button type="submit">Générer</button>
-</form>
+/* Formulaire modernisé */
+.game-form {
+    background: linear-gradient(145deg, rgba(40, 40, 50, 0.8), rgba(30, 30, 40, 0.9));
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 30px;
+}
 
-<!-- Bouton Exploration Libre -->
-<form method="post" action="{% url 'random_game' %}">
-    {% csrf_token %}
-    <button type="submit" class="button-exploration">🎲 Exploration Libre</button>
-</form>
+.form-group {
+    margin-bottom: 25px;
+}
 
+.form-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #03dac6;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-{% if error %}
-    <p class="error">{{ error }}</p>
-{% endif %}
+.form-label i {
+    font-size: 1.2rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 15px;
+    background: rgba(30, 30, 30, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #03dac6;
+    box-shadow: 0 0 10px rgba(3, 218, 198, 0.3);
+    background: rgba(40, 40, 40, 0.7);
+}
+
+.form-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.form-hint {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+/* Boutons */
+.buttons-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.submit-button, .random-button {
+    flex: 1;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.submit-button {
+    background: linear-gradient(45deg, #03dac6, #018786);
+    color: #000000;
+    box-shadow: 0 8px 25px rgba(3, 218, 198, 0.4);
+}
+
+.random-button {
+    background: linear-gradient(45deg, #bb86fc, #8f44fd);
+    color: #000000;
+    box-shadow: 0 8px 25px rgba(187, 134, 252, 0.4);
+}
+
+.submit-button:hover, .random-button:hover {
+    transform: translateY(-5px);
+}
+
+.submit-button:hover {
+    background: linear-gradient(45deg, #02c4b0, #016d6b);
+    box-shadow: 0 12px 30px rgba(3, 218, 198, 0.6);
+}
+
+.random-button:hover {
+    background: linear-gradient(45deg, #ad77ed, #7e35eb);
+    box-shadow: 0 12px 30px rgba(187, 134, 252, 0.6);
+}
+
+.button-glow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 50px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.submit-button .button-glow {
+    background: radial-gradient(circle, rgba(3, 218, 198, 0.4) 0%, transparent 70%);
+}
+
+.random-button .button-glow {
+    background: radial-gradient(circle, rgba(187, 134, 252, 0.4) 0%, transparent 70%);
+}
+
+.submit-button:hover .button-glow, .random-button:hover .button-glow {
+    opacity: 1;
+    animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.4; }
+    100% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* Messages d'erreur */
+.error-message {
+    background: rgba(255, 87, 87, 0.2);
+    border-left: 4px solid #ff5757;
+    color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.error-message i {
+    color: #ff5757;
+    font-size: 1.5rem;
+}
+
+/* Écran de chargement */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.loading-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1;
+}
+
+.loading-modal {
+    position: relative;
+    z-index: 2;
+    background: rgba(30, 30, 40, 0.85);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(187, 134, 252, 0.3);
+    width: 600px;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid rgba(187, 134, 252, 0.3);
+    gap: 25px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #bb86fc rgba(30, 30, 40, 0.5);
+}
+
+/* Scrollbar personnalisée pour Chrome/Safari */
+.loading-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.loading-modal::-webkit-scrollbar-track {
+    background: rgba(30, 30, 40, 0.5);
+    border-radius: 10px;
+}
+
+.loading-modal::-webkit-scrollbar-thumb {
+    background-color: #bb86fc;
+    border-radius: 10px;
+}
+
+.loading-message {
+    color: #ffffff;
+    font-size: 1.6rem;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(187, 134, 252, 0.5);
+    opacity: 0;
+    animation: fadeInUp 0.8s forwards 0.3s;
+}
+
+.loading-animation {
+    width: 100%;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    animation: fadeIn 0.8s forwards;
+}
+
+.loading-animation canvas {
+    width: 100%;
+    height: 100%;
+    max-height: 400px;
+}
+
+.loading-progress {
+    width: 80%;
+    height: 8px;
+    background: rgba(30, 30, 40, 0.6);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    opacity: 0;
+    animation: fadeInUp 0.8s forwards 0.6s;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #03dac6, #bb86fc);
+    box-shadow: 0 0 10px rgba(187, 134, 252, 0.7);
+    animation: loadProgress 15s linear forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes loadProgress {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+</style>
+
+<div class="creation-container">
+    <h2 class="creation-title"><i class="fas fa-magic"></i> Créer un jeu</h2>
+    
+    <form id="gameForm" method="post" class="game-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="genre" class="form-label">
+                <i class="fas fa-gamepad"></i> Genre
+            </label>
+            <input type="text" id="genre" name="genre" class="form-input" placeholder="RPG, FPS, Metroidvania, etc." required>
+            <div class="form-hint">Choisissez le type de gameplay principal de votre jeu</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="ambiance" class="form-label">
+                <i class="fas fa-cloud-moon"></i> Ambiance
+            </label>
+            <input type="text" id="ambiance" name="ambiance" class="form-input" placeholder="Cyberpunk, Fantasy, Post-apocalyptique, etc." required>
+            <div class="form-hint">Définissez l'atmosphère et l'univers de votre jeu</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="keywords" class="form-label">
+                <i class="fas fa-tags"></i> Mots-clés
+            </label>
+            <input type="text" id="keywords" name="keywords" class="form-input" placeholder="IA rebelle, vengeance, voyage temporel, etc." required>
+            <div class="form-hint">Ajoutez des thèmes qui définiront votre histoire (séparés par des virgules)</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="references" class="form-label">
+                <i class="fas fa-bookmark"></i> Références culturelles
+            </label>
+            <input type="text" id="references" name="references" class="form-input" placeholder="Zelda, Hollow Knight, Mass Effect, etc.">
+            <div class="form-hint">Optionnel : mentionnez des œuvres qui vous inspirent</div>
+        </div>
+        
+        <div class="buttons-container">
+            <button type="submit" class="submit-button">
+                <span class="button-glow"></span>
+                <i class="fas fa-wand-magic-sparkles"></i> Générer
+            </button>
+            
+            <button type="button" id="randomButton" class="random-button">
+                <span class="button-glow"></span>
+                <i class="fas fa-dice"></i> Exploration Libre
+            </button>
+        </div>
+    </form>
+
+    {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ error }}</span>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Écran de chargement avec Rive -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-backdrop"></div>
+    
+    <div class="loading-modal">
+        <div class="loading-message">Création de votre jeu en cours...</div>
+        <div class="loading-animation">
+            <canvas id="riveAnimation" width="500" height="400"></canvas>
+        </div>
+        <div class="loading-progress">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const gameForm = document.getElementById('gameForm');
+        const randomButton = document.getElementById('randomButton');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        let riveInstance = null;
+
+        // Initialisation Rive améliorée
+        async function initRive() {
+    try {
+        const canvas = document.getElementById('riveAnimation');
+        if (!canvas) {
+            console.error("Élément canvas non trouvé");
+            return;
+        }
+        
+        // Vérifiez le chemin exact de votre fichier Rive
+        // const response = await fetch("{% static 'animations/mario_puzzle_game.riv' %}");
+        const riveFilePath = "{% static 'animations/mario_puzzle_game.riv' %}";
+        if (!response.ok) {
+            console.error(`Échec du chargement du fichier Rive. Statut : ${response.status}`);
+            return;
+        }
+        
+        const arrayBuffer = await response.arrayBuffer();
+        
+        riveInstance = new rive.Rive({
+            buffer: arrayBuffer,
+            canvas: canvas,
+            autoplay: true,  // Activation du lecture automatique
+            layout: new rive.Layout({
+                fit: rive.Fit.Contain,
+                alignment: rive.Alignment.Center
+            }),
+            onLoad: () => {
+                console.log("Animation Rive chargée avec succès");
+                try {
+                    riveInstance.play();  // Lecture explicite
+                } catch (playError) {
+                    console.error("Erreur de lecture de l'animation:", playError);
+                }
+            },
+            onError: (err) => {
+                console.error("Erreur d'animation Rive:", err);
+                document.querySelector('.loading-animation').innerHTML = 
+                    '<div style="color:white;text-align:center;">Animation non disponible</div>';
+            }
+        });
+    } catch (error) {
+        console.error("Erreur d'initialisation complète de Rive:", error);
+        document.querySelector('.loading-animation').innerHTML = 
+            '<div style="color:white;text-align:center;">Erreur de chargement</div>';
+    }
+}
+
+        // Fonction pour afficher l'overlay
+        function showLoadingOverlay() {
+            loadingOverlay.classList.add('show');
+            // document.body.style.overflow = 'hidden';
+            
+            if (riveInstance) {
+                try {
+                    riveInstance.play();
+                } catch (e) {
+                    console.error("Error playing Rive animation:", e);
+                }
+            }
+        }
+
+        // Initialiser Rive
+        initRive();
+
+        // Gestionnaire pour le formulaire principal
+        gameForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoadingOverlay();
+            
+            // Soumettre le formulaire après un court délai
+            setTimeout(() => {
+                gameForm.submit();
+            }, 500);
+        });
+        
+        // Gestionnaire pour le bouton d'exploration libre
+        randomButton.addEventListener('click', function() {
+            showLoadingOverlay();
+            
+            setTimeout(() => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{% url 'random_game' %}";
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = 'csrfmiddlewaretoken';
+                csrfToken.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                form.appendChild(csrfToken);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }, 300);
+        });
+        
+        // Masquer l'overlay si erreur
+        if (document.querySelector('.error-message')) {
+            loadingOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+</script>
 {% endblock %}
