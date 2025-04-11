@@ -4,7 +4,7 @@ from django.urls import reverse
 EXEMPT_URLS = [
     '/users/login/',
     '/users/signup/',
-    '/about/',
+    
 ]
 
 class LoginRequiredMiddleware:
@@ -12,6 +12,13 @@ class LoginRequiredMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # URLs exemptées de l'authentification
+        exempt_urls = [
+            '/',  
+            '/login/',
+            '/signup/',
+            '/about/',
+        ]
         if not request.user.is_authenticated:
             path = request.path_info
             if not any(path.startswith(url) for url in EXEMPT_URLS):

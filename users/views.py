@@ -12,6 +12,10 @@ from django.contrib.auth.models import User
 # Dictionnaire global pour bloquer temporairement les comptes (à améliorer avec cache ou base)
 login_attempts = {}
 
+
+def splash_view(request):
+    return render(request, 'splash.html')
+
 def signup_view(request):
     if request.method == 'POST':
         form = SignupForm(request.POST, request.FILES)

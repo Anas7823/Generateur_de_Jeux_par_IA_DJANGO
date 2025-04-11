@@ -1,0 +1,868 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameForge - Initialisation</title>
+    
+    <!-- Polices -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CDN Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #bb86fc;
+            --secondary-color: #03dac6;
+            --accent-color: #cf6679;
+            --dark-bg: #0a0a1a;
+            --darker-bg: #070712;
+            --light-text: #ffffff;
+        }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--dark-bg);
+            overflow: hidden;
+            color: var(--light-text);
+        }
+        
+        #splash-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(10,10,26,0.98) 0%, rgba(20,20,50,0.98) 100%);
+            z-index: 9999;
+        }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        #logo-container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 90%;
+        }
+        
+        .logo-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+            perspective: 1000px;
+        }
+        
+        #logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--light-text);
+            text-shadow: 0 0 20px rgba(3, 218, 198, 0.7);
+            opacity: 0;
+            letter-spacing: 4px;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        #logo-icon {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            opacity: 0;
+        }
+        
+        #logo::before, #logo::after {
+            content: 'GameForge';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0.3;
+        }
+        
+        #logo::before {
+            color: var(--secondary-color);
+            transform: translateZ(-10px) translateX(-5px);
+            clip-path: polygon(0 0, 85% 0, 100% 100%, 0 100%);
+            animation: glitch 5s infinite alternate;
+        }
+        
+        #logo::after {
+            color: var(--primary-color);
+            transform: translateZ(-5px) translateX(5px);
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+            animation: glitch 4s infinite alternate-reverse;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translateZ(-10px) translateX(-5px); }
+            25% { transform: translateZ(-10px) translateX(-3px); }
+            50% { transform: translateZ(-10px) translateX(-6px); }
+            75% { transform: translateZ(-10px) translateX(-4px); }
+        }
+        
+        .logo-underline {
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            margin-top: 8px;
+            position: relative;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .logo-underline::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            animation: shine 2s infinite;
+        }
+        
+        @keyframes shine {
+            100% { left: 100%; }
+        }
+        
+        .loading-container {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        #loading-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-top: 20px;
+            font-size: 1.4rem;
+            opacity: 0;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        #loading-text i {
+            animation: pulse 1.5s infinite;
+            color: var(--secondary-color);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
+        }
+        
+        #progress-container {
+            width: 100%;
+            position: relative;
+            opacity: 0;
+        }
+        
+        #progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(187, 134, 252, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(187, 134, 252, 0.3);
+            box-shadow: 0 0 20px rgba(187, 134, 252, 0.2);
+        }
+        
+        #progress {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(3, 218, 198, 0.7);
+        }
+        
+        #progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                transparent 100%);
+            transform: skewX(-20deg);
+            animation: progressShine 1.5s infinite;
+        }
+        
+        @keyframes progressShine {
+            from { transform: translateX(-100%) skewX(-20deg); }
+            to { transform: translateX(300%) skewX(-20deg); }
+        }
+        
+        #progress-text {
+            position: absolute;
+            bottom: -25px;
+            right: 0;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            font-weight: 500;
+            opacity: 0;
+        }
+        
+        .loading-stages {
+            margin-top: 40px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            opacity: 0;
+        }
+        
+        .stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.4;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+        
+        .stage.active {
+            opacity: 1;
+        }
+        
+        .stage-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(3, 218, 198, 0.1);
+            border: 2px solid rgba(3, 218, 198, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stage.completed .stage-icon {
+            background: rgba(3, 218, 198, 0.2);
+            border-color: var(--secondary-color);
+        }
+        
+        .stage-icon i {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+        
+        .stage-label {
+            font-size: 0.85rem;
+            color: var(--light-text);
+            text-align: center;
+        }
+        
+        .stage-connector {
+            position: absolute;
+            top: 20px;
+            right: 50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(3, 218, 198, 0.3);
+            z-index: 1;
+        }
+        
+        .stage:last-child .stage-connector {
+            display: none;
+        }
+        
+        /* Effet de flottement */
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        /* Canvas pour Three.js */
+        #three-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        /* Animation de démarrage */
+        #splash-start {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker-bg);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #start-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            color: var(--secondary-color);
+            font-size: 4rem;
+            letter-spacing: 4px;
+            position: relative;
+            opacity: 0;
+        }
+        
+        /* Effet de branchement pour le logo */
+        .circuit-container {
+            position: absolute;
+            top: -80px;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            overflow: hidden;
+            opacity: 0;
+        }
+        
+        .circuit {
+            position: absolute;
+            bottom: 0;
+            width: 2px;
+            background: var(--secondary-color);
+            height: 0;
+        }
+        
+        .circuit:nth-child(1) { left: 10%; height: 60%; }
+        .circuit:nth-child(2) { left: 30%; height: 80%; }
+        .circuit:nth-child(3) { left: 50%; height: 40%; }
+        .circuit:nth-child(4) { left: 70%; height: 70%; }
+        .circuit:nth-child(5) { left: 90%; height: 50%; }
+        
+        .circuit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -3px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            box-shadow: 0 0 10px var(--secondary-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #logo {
+                font-size: 3rem;
+            }
+            
+            #logo-icon {
+                top: -30px;
+                font-size: 2rem;
+            }
+            
+            .loading-container {
+                max-width: 90%;
+            }
+            
+            #loading-text {
+                font-size: 1.2rem;
+            }
+            
+            .stage-icon {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .stage-label {
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #logo {
+                font-size: 2.2rem;
+            }
+            
+            #logo-icon {
+                top: -25px;
+                font-size: 1.5rem;
+            }
+            
+            #loading-text {
+                font-size: 1rem;
+            }
+            
+            .stage-icon {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .stage-icon i {
+                font-size: 0.9rem;
+            }
+            
+            .stage-label {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animation de démarrage initiale -->
+    <div id="splash-start">
+        <div id="start-logo">GAMEFORGE</div>
+    </div>
+    
+    <!-- Conteneur principal -->
+    <div id="splash-container">
+        <div id="particles-js"></div>
+        <canvas id="three-bg"></canvas>
+        
+        <div id="logo-container" class="floating">
+            <div class="logo-wrapper">
+                <div id="logo-icon"><i class="fas fa-gamepad"></i></div>
+                <div id="logo">GameForge</div>
+                <div class="logo-underline"></div>
+                <div class="circuit-container">
+                    <div class="circuit"></div>
+                    <div class="circuit"></div>
+                    <div class="circuit"></div>
+                    <div class="circuit"></div>
+                    <div class="circuit"></div>
+                </div>
+            </div>
+            
+            <div class="loading-container">
+                <div id="loading-text">
+                    <i class="fas fa-cog fa-spin"></i>
+                    <span>Initialisation du générateur de mondes...</span>
+                </div>
+                
+                <div id="progress-container">
+                    <div id="progress-bar">
+                        <div id="progress"></div>
+                    </div>
+                    <div id="progress-text">0%</div>
+                </div>
+                
+                <div class="loading-stages">
+                    <div class="stage active" id="stage-1">
+                        <div class="stage-icon">
+                            <i class="fas fa-power-off"></i>
+                        </div>
+                        <div class="stage-label">Démarrage</div>
+                        <div class="stage-connector"></div>
+                    </div>
+                    
+                    <div class="stage" id="stage-2">
+                        <div class="stage-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="stage-label">Chargement des données</div>
+                        <div class="stage-connector"></div>
+                    </div>
+                    
+                    <div class="stage" id="stage-3">
+                        <div class="stage-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="stage-label">Activation de l'IA</div>
+                        <div class="stage-connector"></div>
+                    </div>
+                    
+                    <div class="stage" id="stage-4">
+                        <div class="stage-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="stage-label">Lancement</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration 3D background
+        const initThreeBackground = () => {
+            // Création de la scène
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('three-bg'),
+                alpha: true
+            });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            
+            // Positionnement de la caméra
+            camera.position.z = 30;
+            
+            // Création d'une grille de points
+            const gridSize = 20;
+            const gridSpacing = 3;
+            const gridPoints = [];
+            
+            // Matériel pour les points
+            const pointMaterial = new THREE.PointsMaterial({
+                color: 0x03dac6,
+                size: 0.2,
+                transparent: true,
+                opacity: 0.7
+            });
+            
+            // Création des points dans une grille
+            const pointGeometry = new THREE.BufferGeometry();
+            const positions = [];
+            
+            for (let x = -gridSize; x <= gridSize; x += gridSpacing) {
+                for (let y = -gridSize; y <= gridSize; y += gridSpacing) {
+                    for (let z = -gridSize; z <= gridSize; z += gridSpacing) {
+                        if (Math.random() > 0.7) {
+                            positions.push(x, y, z);
+                            gridPoints.push({ 
+                                x, y, z, 
+                                originX: x, 
+                                originY: y, 
+                                originZ: z,
+                                velocity: new THREE.Vector3(
+                                    (Math.random() - 0.5) * 0.01,
+                                    (Math.random() - 0.5) * 0.01,
+                                    (Math.random() - 0.5) * 0.01
+                                )
+                            });
+                        }
+                    }
+                }
+            }
+            
+            pointGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            const points = new THREE.Points(pointGeometry, pointMaterial);
+            scene.add(points);
+            
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Rotation de la grille
+                points.rotation.y += 0.001;
+                points.rotation.x += 0.0005;
+                
+                // Animation des points
+                const positions = points.geometry.attributes.position.array;
+                
+                for (let i = 0; i < gridPoints.length; i++) {
+                    const point = gridPoints[i];
+                    
+                    // Petit mouvement aléatoire
+                    point.x += point.velocity.x;
+                    point.y += point.velocity.y;
+                    point.z += point.velocity.z;
+                    
+                    // Limite de mouvement
+                    if (Math.abs(point.x - point.originX) > gridSpacing * 0.2) {
+                        point.velocity.x *= -1;
+                    }
+                    if (Math.abs(point.y - point.originY) > gridSpacing * 0.2) {
+                        point.velocity.y *= -1;
+                    }
+                    if (Math.abs(point.z - point.originZ) > gridSpacing * 0.2) {
+                        point.velocity.z *= -1;
+                    }
+                    
+                    // Mise à jour des positions
+                    positions[i * 3] = point.x;
+                    positions[i * 3 + 1] = point.y;
+                    positions[i * 3 + 2] = point.z;
+                }
+                
+                points.geometry.attributes.position.needsUpdate = true;
+                
+                renderer.render(scene, camera);
+            }
+            
+            // Gestion du redimensionnement
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            
+            animate();
+        };
+        
+        // Particles.js Configuration
+        const initParticles = () => {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { 
+                        value: 120, 
+                        density: { enable: true, value_area: 800 } 
+                    },
+                    color: { value: ['#03dac6', '#bb86fc', '#ffffff'] },
+                    shape: { 
+                        type: 'circle',
+                        stroke: { width: 0, color: '#000000' }
+                    },
+                    opacity: { 
+                        value: 0.5, 
+                        random: true, 
+                        anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } 
+                    },
+                    size: { 
+                        value: 3, 
+                        random: true, 
+                        anim: { enable: false, speed: 40, size_min: 0.1, sync: false } 
+                    },
+                    line_linked: { 
+                        enable: true, 
+                        distance: 150, 
+                        color: '#bb86fc', 
+                        opacity: 0.2, 
+                        width: 1 
+                    },
+                    move: { 
+                        enable: true, 
+                        speed: 1.5, 
+                        direction: 'none', 
+                        random: false, 
+                        straight: false, 
+                        out_mode: 'out', 
+                        bounce: false,
+                        attract: { enable: false, rotateX: 600, rotateY: 1200 }
+                    }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: { 
+                        onhover: { enable: true, mode: 'repulse' },
+                        onclick: { enable: true, mode: 'push' },
+                        resize: true 
+                    },
+                    modes: {
+                        repulse: { distance: 100, duration: 0.4 },
+                        push: { particles_nb: 4 }
+                    }
+                },
+                retina_detect: true
+            });
+        };
+
+        // Animations de séquence GSAP
+        const startAnimations = () => {
+            const tl = gsap.timeline();
+            
+            // Animation initiale
+            tl.to('#start-logo', {
+                opacity: 1,
+                duration: 1,
+                ease: 'power2.out'
+            })
+            .to('#start-logo', {
+                textShadow: '0 0 30px rgba(3, 218, 198, 0.9)',
+                repeat: 3,
+                yoyo: true,
+                duration: 0.1
+            }, '-=0.5')
+            .to('#start-logo', {
+                opacity: 0,
+                duration: 0.5,
+                ease: 'power2.in',
+                onComplete: () => {
+                    gsap.to('#splash-start', {
+                        opacity: 0,
+                        duration: 0.5,
+                        ease: 'power2.in',
+                        onComplete: () => {
+                            document.getElementById('splash-start').style.display = 'none';
+                        }
+                    });
+                }
+            }, '+=0.5');
+            
+            // Animation du logo principal
+            tl.fromTo('#logo-icon', 
+                { y: -20, opacity: 0 }, 
+                { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' },
+                '+=0.3'
+            )
+            .fromTo('#logo', 
+                { scale: 0.7, opacity: 0, rotationX: -30 }, 
+                { 
+                    scale: 1,
+                    rotationX: 0, 
+                    opacity: 1, 
+                    duration: 1.2, 
+                    ease: 'power3.out'
+                },
+                '-=0.4'
+            )
+            .to('.logo-underline', {
+                width: '100%',
+                duration: 1,
+                ease: 'power2.inOut'
+            }, '-=0.6')
+            .fromTo('.circuit-container', 
+                { opacity: 0 }, 
+                { opacity: 1, duration: 0.5 },
+                '-=0.8'
+            )
+            .fromTo('#loading-text', 
+                { y: 20, opacity: 0 }, 
+                { y: 0, opacity: 1, duration: 0.7, ease: 'power2.out' },
+                '-=0.3'
+            )
+            .fromTo('#progress-container', 
+                { opacity: 0, y: 20 }, 
+                { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' },
+                '-=0.5'
+            )
+            .fromTo('.loading-stages', 
+                { opacity: 0, y: 20 }, 
+                { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' },
+                '-=0.5'
+            )
+            .fromTo('#progress-text', 
+                { opacity: 0 }, 
+                { opacity: 1, duration: 0.5 },
+                '-=0.3'
+            );
+            
+            // Animation du curseur interactif
+            document.addEventListener('mousemove', (e) => {
+                const mouseX = e.clientX / window.innerWidth;
+                const mouseY = e.clientY / window.innerHeight;
+                
+                gsap.to('#splash-container', {
+                    background: `radial-gradient(circle at ${e.clientX}px ${e.clientY}px, rgba(30, 30, 60, 0.8), rgba(10, 10, 26, 0.98))`,
+                    duration: 1
+                });
+                
+                gsap.to('#logo-container', {
+                    x: (mouseX - 0.5) * 20,
+                    y: (mouseY - 0.5) * 20,
+                    duration: 1
+                });
+            });
+            
+            return tl;
+        };
+        
+        // Animation de la barre de progression
+        const animateProgress = () => {
+            const progressBar = document.getElementById('progress');
+            const progressText = document.getElementById('progress-text');
+            const stages = [
+                document.getElementById('stage-1'),
+                document.getElementById('stage-2'),
+                document.getElementById('stage-3'),
+                document.getElementById('stage-4')
+            ];
+            
+            let currentProgress = 0;
+            const totalDuration = 5; // secondes
+            const updateInterval = 50; // ms
+            const progressIncrement = (100 / (totalDuration * 1000)) * updateInterval;
+            
+            // Fonction pour mettre à jour les étapes
+            const updateStages = (progress) => {
+                if (progress >= 0) {
+                    stages[0].classList.add('active', 'completed');
+                }
+                if (progress >= 33) {
+                    stages[1].classList.add('active', 'completed');
+                }
+                if (progress >= 66) {
+                    stages[2].classList.add('active', 'completed');
+                }
+                if (progress >= 95) {
+                    stages[3].classList.add('active', 'completed');
+                }
+            };
+            
+            const progressInterval = setInterval(() => {
+                currentProgress += progressIncrement;
+                if (currentProgress >= 100) {
+                    currentProgress = 100;
+                    clearInterval(progressInterval);
+                    
+                    // Animation finale et redirection
+                    setTimeout(() => {
+                        gsap.to('#splash-container', {
+                            opacity: 0,
+                            scale: 1.1,
+                            duration: 1.2,
+                            ease: 'power3.in',
+                            onComplete: () => {
+                                window.location.href = '/dashboard';
+                            }
+                        });
+                    }, 500);
+                }
+                
+                // Mise à jour de la barre de progression
+                progressBar.style.width = `${currentProgress}%`;
+                progressText.textContent = `${Math.floor(currentProgress)}%`;
+                
+                // Mise à jour des étapes
+                updateStages(currentProgress);
+            }, updateInterval);
+        };
+        
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser Particles.js
+            initParticles();
+            
+            // Initialiser Three.js background
+            initThreeBackground();
+            
+            // Démarrer les animations
+            const mainTimeline = startAnimations();
+            
+            // Démarrer la barre de progression après les animations initiales
+            mainTimeline.eventCallback('onComplete', () => {
+                animateProgress();
+            });
+        });
+    </script>
+</body>
+</html>
