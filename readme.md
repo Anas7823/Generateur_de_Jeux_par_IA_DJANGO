@@ -21,6 +21,7 @@ DB_PASSWORD=mot_de_passe_mysql
 DB_HOST=Votre_host (localhost ou autre)
 DB_PORT=votre_port
 
+HUGGINGFACE_API_KEY=hf_...votre_cle_huggingface
 # Faire les migrations
 
 python manage.py makemigration

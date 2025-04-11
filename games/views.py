@@ -157,7 +157,8 @@ N'oublie pas : ton objectif est de **faire rêver** un joueur ou un investisseur
                 "parameters": {
                     "max_length": 800,
                     "temperature": 0.7,
-                    "top_p": 0.9
+                    "top_p": 0.9,
+                    "return_full_text": False,
                 }
             }
 
@@ -265,7 +266,8 @@ Le titre doit être court (maximum 3-4 mots), créatif et mémorable. Donne uniq
             "parameters": {
                 "max_length": 50,
                 "temperature": 0.9,
-                "top_p": 0.9
+                "top_p": 0.9,
+                "return_full_text": False,
             }
         }
 
@@ -299,7 +301,8 @@ Crée une histoire structurée avec :
             "parameters": {
                 "max_length": 800,
                 "temperature": 0.7,
-                "top_p": 0.9
+                "top_p": 0.9,
+                "return_full_text": False,
             }
         }
 
