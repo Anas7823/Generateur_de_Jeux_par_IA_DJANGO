@@ -1,15 +1,480 @@
-<!-- templates/games/generation_success.html -->
 {% extends "base.html" %}
-{% block title %}Résultat de la génération{% endblock %}
+{% load static %}
+{% block title %}{{ game.title }} - Détails{% endblock %}
 {% block content %}
+<style>
+/* Styles pour la page de détails de jeu */
+.game-details-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+.game-header {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.game-title-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.game-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #ffffff;
+    font-size: 2.8rem;
+    margin: 0;
+    text-align: center;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    display: inline-block;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.game-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, #03dac6, #bb86fc);
+    border-radius: 3px;
+}
+
+.game-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.favorite-btn {
+    background: transparent;
+    border: 2px solid #bb86fc;
+    color: #bb86fc;
+    padding: 12px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.favorite-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #bb86fc, #8f44fd);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.favorite-btn:hover {
+    color: #000000;
+    border-color: #bb86fc;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(187, 134, 252, 0.3);
+}
+
+.favorite-btn:hover::before {
+    opacity: 1;
+}
+
+.favorite-btn.active {
+    background: linear-gradient(45deg, #bb86fc, #8f44fd);
+    color: #000000;
+    border-color: transparent;
+}
+
+.favorite-btn i {
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+.favorite-btn:hover i {
+    transform: rotate(72deg);
+}
+
+/* Conteneur principal en deux colonnes */
+.game-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/* Colonne de gauche - image et métadonnées */
+.game-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Colonne de droite - contenu et scénario */
+.game-right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Boîte d'illustration */
+.game-illustration {
+    background: linear-gradient(145deg, rgba(40, 40, 50, 0.8), rgba(30, 30, 40, 0.9));
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.game-illustration img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 16px;
+    transition: transform 0.5s ease;
+}
+
+.game-illustration:hover img {
+    transform: scale(1.03);
+}
+
+.illustration-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
+    border-radius: 16px 16px 0 0;
+}
+
+.illustration-title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 1.4rem;
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Boîte de métadonnées */
+.game-metadata {
+    background: linear-gradient(145deg, rgba(40, 40, 50, 0.8), rgba(30, 30, 40, 0.9));
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metadata-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.metadata-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.metadata-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.metadata-label {
+    font-weight: bold;
+    color: #03dac6;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.metadata-value {
+    color: #ffffff;
+    background: rgba(30, 30, 30, 0.6);
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-weight: 500;
+    border-left: 3px solid #03dac6;
+}
+
+/* Boîtes de contenu */
+.content-box {
+    background: linear-gradient(145deg, rgba(40, 40, 50, 0.8), rgba(30, 30, 40, 0.9));
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.content-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.content-text {
+    color: #e0e0e0;
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+.content-text p {
+    margin-bottom: 15px;
+}
+
+.content-text strong {
+    color: #bb86fc;
+}
+
+/* Lien de retour */
+.back-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.back-button {
+    background: linear-gradient(45deg, #03dac6, #018786);
+    color: #000000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 15px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(3, 218, 198, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.back-button i {
+    font-size: 1.4rem;
+    transition: transform 0.3s ease;
+}
+
+.back-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(3, 218, 198, 0.6);
+    background: linear-gradient(45deg, #02c4b0, #016d6b);
+}
+
+.back-button:hover i {
+    transform: translateX(-5px);
+}
+
+.button-glow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(3, 218, 198, 0.4) 0%, transparent 70%);
+    top: 0;
+    left: 0;
+    border-radius: 50px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.back-button:hover .button-glow {
+    opacity: 1;
+    animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.4; }
+    100% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* Animation d'entrée */
+.animate-in {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s forwards;
+}
+
+.delay-1 {
+    animation-delay: 0.1s;
+}
+
+.delay-2 {
+    animation-delay: 0.3s;
+}
+
+.delay-3 {
+    animation-delay: 0.5s;
+}
+
+.delay-4 {
+    animation-delay: 0.7s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .game-content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .game-title {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-title {
+        font-size: 1.8rem;
+    }
+    
+    .content-title, .metadata-title, .illustration-title {
+        font-size: 1.4rem;
+    }
+    
+    .metadata-label {
+        font-size: 1rem;
+    }
+    
+    .back-button {
+        width: 100%;
+        font-size: 1rem;
+        padding: 12px 20px;
+    }
+}
+</style>
+
 {% csrf_token %}
-<div class="game-actions">
-    <button class="favorite-btn {% if request.user in game.favorites.all %}active{% endif %}" 
-            data-game-id="{{ game.id }}" 
-            onclick="toggleFavorite(this)">
-        <i class="fas {% if request.user in game.favorites.all %}fa-star{% else %}fa-regular fa-star{% endif %}"></i>
-        <span>Favoris</span>
-    </button>
+
+<div class="game-details-container">
+    <div class="game-header animate-in">
+        <div class="game-actions">
+            <button class="favorite-btn {% if request.user in game.favorites.all %}active{% endif %}" 
+                    data-game-id="{{ game.id }}" 
+                    onclick="toggleFavorite(this)">
+                <i class="fas {% if request.user in game.favorites.all %}fa-star{% else %}fa-regular fa-star{% endif %}"></i>
+                <span>Ajouter aux favoris</span>
+            </button>
+        </div>
+        
+        <div class="game-title-container">
+            <h1 class="game-title">{{ game.title }}</h1>
+        </div>
+    </div>
+    
+    <div class="game-content-grid">
+        <!-- Colonne de gauche -->
+        <div class="game-left-column">
+            {% if game.image_environment %}
+                <div class="game-illustration animate-in delay-1">
+                    <div class="illustration-overlay">
+                        <h3 class="illustration-title"><i class="fas fa-image"></i> Illustration</h3>
+                    </div>
+                    <img src="{{ game.image_environment.url }}" alt="{{ game.title }}">
+                </div>
+            {% endif %}
+            
+            <div class="game-metadata animate-in delay-2">
+                <h3 class="metadata-title"><i class="fas fa-info-circle"></i> Informations</h3>
+                <div class="metadata-list">
+                    <div class="metadata-item">
+                        <div class="metadata-label"><i class="fas fa-gamepad"></i> Genre</div>
+                        <div class="metadata-value">{{ game.genre }}</div>
+                    </div>
+                    
+                    <div class="metadata-item">
+                        <div class="metadata-label"><i class="fas fa-cloud-moon"></i> Ambiance</div>
+                        <div class="metadata-value">{{ game.ambiance }}</div>
+                    </div>
+                    
+                    <div class="metadata-item">
+                        <div class="metadata-label"><i class="fas fa-tags"></i> Mots-clés</div>
+                        <div class="metadata-value">{{ game.keywords }}</div>
+                    </div>
+                    
+                    {% if game.references %}
+                    <div class="metadata-item">
+                        <div class="metadata-label"><i class="fas fa-bookmark"></i> Références</div>
+                        <div class="metadata-value">{{ game.references }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Colonne de droite -->
+        <div class="game-right-column">
+            <div class="content-box animate-in delay-3">
+                <h3 class="content-title"><i class="fas fa-globe"></i> Univers</h3>
+                <div class="content-text">
+                    {{ game.universe|safe|linebreaks }}
+                </div>
+            </div>
+            
+            <div class="content-box animate-in delay-4">
+                <h3 class="content-title"><i class="fas fa-book"></i> Scénario</h3>
+                <div class="content-text">
+                    {{ game.story|safe|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="back-button-container animate-in delay-4">
+        <a href="{% url 'dashboard' %}" class="back-button">
+            <span class="button-glow"></span>
+            <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
 </div>
 
 <script>
@@ -49,85 +514,10 @@
             alert('Une erreur est survenue lors de la mise à jour des favoris');
         });
     }
+    
+    // Animation d'apparition au chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animations déjà gérées par les classes CSS
+    });
 </script>
-
-<h3>🎮 Jeu généré avec succès</h3>
-
-<h2>{{ game.title }}</h2>
-
-
-{% if game.image_environment %}
-    <div class="game-illustration">
-        <h3>🖼️ Illustration générée</h3>
-        <img src="{{ game.image_environment.url }}" alt="Image générée">
-    </div>
-{% endif %}
-
-<div class="game-details">
-    <p><strong>Genre :</strong> {{ game.genre }}</p>
-    <p><strong>Ambiance :</strong> {{ game.ambiance }}</p>
-    <p><strong>Mots-clés :</strong> {{ game.keywords }}</p>
-    <p><strong>Références :</strong> {{ game.references }}</p>
-</div>
-
-<div class="game-content">
-    {{ game.universe|safe|linebreaks }}
-</div>
-
-<div class="game-scenario">
-    <h3>📖 Scénario</h3>
-    {{ game.story|safe|linebreaks }}
-</div>
-
-
-<a href="{% url 'dashboard' %}" class="button">Retour au tableau de bord</a>
 {% endblock %}
-
-<style>
-    .favorite-btn {
-    background: transparent;
-    border: 2px solid var(--primary-color);
-    color: var(--primary-color);
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.favorite-btn:hover {
-    background: var(--primary-color);
-    color: var(--bg-dark);
-}
-
-.favorite-btn.active {
-    background: var(--primary-color);
-    color: var(--bg-dark);
-}
-
-.favorite-btn i {
-    font-size: 1.2em;
-}
-
-.game-card {
-    background: var(--bg-medium);
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    transition: transform 0.3s ease;
-}
-
-.game-card:hover {
-    transform: translateY(-5px);
-}
-
-.game-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin: 10px 0;
-}
-</style>
