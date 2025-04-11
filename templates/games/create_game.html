@@ -19,6 +19,13 @@
     <button type="submit">Générer</button>
 </form>
 
+<!-- Bouton Exploration Libre -->
+<form method="post" action="{% url 'random_game' %}">
+    {% csrf_token %}
+    <button type="submit" class="button-exploration">🎲 Exploration Libre</button>
+</form>
+
+
 {% if error %}
     <p class="error">{{ error }}</p>
 {% endif %}

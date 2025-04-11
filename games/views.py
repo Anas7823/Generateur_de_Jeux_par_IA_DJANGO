@@ -9,6 +9,8 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from transformers import pipeline
 from diffusers import DiffusionPipeline
+import random
+
 
 # API Views
 
@@ -82,47 +84,60 @@ def guided_creation_view(request):
         references = request.POST.get('references')
 
         # Préparer le prompt pour l'histoire
-        story_prompt = f"""Créer un concept de jeu vidéo orignal avec les éléments suivants :
-Genre : {genre}
-Ambiance : {ambiance}
-Mots-clés : {keywords}
-Références : {references}.
+        story_prompt = f"""Tu es un créateur de jeux vidéo innovant.
+        
+Ta mission : imaginer un **concept de jeu vidéo original et captivant** en t'appuyant sur les éléments suivants :
 
-Fais preuve d'imagination concernant le scénario du jeu. Ton but est de créer une histoire attrayante et invente les différents noms demandés.
+- **Genre** : {genre}  
+- **Ambiance** : {ambiance}  
+- **Mots-clés** : {keywords}  
+- **Références d'inspiration** : {references}  
 
-Format requis :
+Inspire-toi librement des références mentionnées, mais propose une création inédite, immersive, et scénaristiquement forte. Tu dois **créer un univers, un scénario en 3 actes, des personnages profonds, et des lieux marquants**.
 
-# Univers
-[Décrire l'univers du jeu de manière structurée et immersive]
+**Attention** : Tous les noms (jeu, personnages, lieux) doivent être **originaux** et **imaginatifs**. Rédige de manière fluide et structurée, comme si tu préparais une présentation officielle du jeu.
 
-# Scénario en 3 actes
-## Acte 1 : L'introduction
-[Décrire le début de l'histoire]
+---
 
-## Acte 2 : Le développement et le retournement
-[Décrire le développement et le twist majeur]
+### Format de réponse attendu :
 
-## Acte 3 : Le dénouement
-[Décrire la conclusion]
+# 🎮 Titre du jeu  
+[Un titre fort, original, accrocheur et évocateur du thème du jeu]
 
-# Personnages principaux (2-4)
-## [Nom du personnage 1]
-- Classe/Type : [préciser]
-- Rôle narratif : [préciser]
-- Background : [histoire du personnage]
-- Gameplay : [style de jeu et capacités]
+# 🌍 Univers  
+[Décris le monde du jeu : époque, lieux, technologies, société, enjeux. Sois immersif.]
 
-## [Nom du personnage 2]
+# 🎭 Scénario en 3 actes  
+## Acte 1 – Introduction  
+[Pose les bases : contexte, protagoniste(s), début de la quête]
+
+## Acte 2 – Montée en tension / Twist  
+[Développement des enjeux, obstacles, révélations, retournement narratif majeur]
+
+## Acte 3 – Dénouement  
+[Climax et résolution. Donne une vraie fin : ouverte, tragique, heureuse, etc.]
+
+# 🧙 Personnages principaux (2 à 4)  
+## [Nom du personnage 1]  
+- **Classe/Type** : [ex. Chasseur cybernétique, Mage errant…]  
+- **Rôle dans l’histoire** : [héros, antagoniste, mentor, etc.]  
+- **Passé et motivations** : [background et traits de caractère]  
+- **Gameplay** : [style de jeu, mécaniques spécifiques, capacités]  
+
+## [Nom du personnage 2]  
 [Même structure]
 
-# Lieux emblématiques
-## [Nom du lieu 1]
-[Description immersive]
+# 🗺️ Lieux emblématiques  
+## [Nom du lieu 1]  
+[Décris ce lieu comme s’il s’agissait d’un décor de film ou de roman]
 
-## [Nom du lieu 2]
-[Description immersive]
-"""
-        
+## [Nom du lieu 2]  
+[Idem : une ambiance forte, une importance narrative ou de gameplay]
+
+---
+
+N'oublie pas : ton objectif est de **faire rêver** un joueur ou un investisseur potentiel. Sois créatif, riche et cohérent.
+"""        
         try:
             # Appel à l'API Hugging Face pour générer l'histoire
             headers = {"Authorization": f"Bearer {settings.HUGGINGFACE_API_KEY}"}
@@ -200,3 +215,118 @@ Format requis :
             return render(request, 'games/create_game.html', {'error': "Erreur dans la réponse de l'API."})
 
     return render(request, 'games/create_game.html')
+
+
+@login_required
+def random_game_view(request):
+    # Générer des valeurs aléatoires pour le jeu
+    genres = ["RPG", "FPS", "Aventure", "Simulation", "Stratégie", "Survie"]
+    ambiances = ["Fantasy", "Cyberpunk", "Post-apocalyptique", "Horreur", "Science-fiction", "Historique", "Steampunk", "Moderne"]
+    keywords = ["exploration", "combat", "magie", "technologie", "survie", "énigmes", "quête", "aventure", "mystère"]
+    references = ["Zelda", "Fallout", "Mass Effect", "Dark Souls", "Minecraft", "The Witcher", "Skyrim", "Half-Life", "Portal", "GTA", "Detroit become human"]
+
+    genre = random.choice(genres)
+    ambiance = random.choice(ambiances)
+    selected_keywords = ", ".join(random.sample(keywords, 3))
+    selected_references = random.choice(references)
+
+    try:
+        # Générer le titre
+        title_prompt = f"""Génère un titre unique et accrocheur pour un jeu vidéo avec ces éléments :
+Genre : {genre}
+Ambiance : {ambiance}
+Mots-clés : {selected_keywords}
+Références : {selected_references}
+
+Le titre doit être court (maximum 3-4 mots), créatif et mémorable. Donne uniquement le titre, sans explication."""
+
+        headers = {"Authorization": f"Bearer {settings.HUGGINGFACE_API_KEY}"}
+        title_payload = {
+            "inputs": title_prompt,
+            "parameters": {
+                "max_length": 50,
+                "temperature": 0.9,
+                "top_p": 0.9
+            }
+        }
+
+        # Appel à l'API pour le titre
+        title_response = requests.post(settings.TEXT_GEN_ENDPOINT, headers=headers, json=title_payload)
+        title_response.raise_for_status()
+        title_result = title_response.json()
+        generated_title = title_result[0]["generated_text"].strip().split('\n')[0]
+        
+        # Limiter la longueur du titre
+        if len(generated_title) > 100:
+            generated_title = generated_title[:97] + "..."
+
+        # Générer l'histoire
+        story_prompt = f"""Tu es un créateur de jeux vidéo innovant.
+Ta mission : imaginer un concept de jeu vidéo original et captivant en t'appuyant sur les éléments suivants :
+
+- Genre : {genre}
+- Ambiance : {ambiance}
+- Mots-clés : {selected_keywords}
+- Références : {selected_references}
+
+Crée une histoire structurée avec :
+- Un univers immersif
+- Un scénario en 3 actes
+- Des personnages mémorables
+- Des lieux emblématiques"""
+
+        story_payload = {
+            "inputs": story_prompt,
+            "parameters": {
+                "max_length": 800,
+                "temperature": 0.7,
+                "top_p": 0.9
+            }
+        }
+
+        # Appel à l'API pour l'histoire
+        story_response = requests.post(settings.TEXT_GEN_ENDPOINT, headers=headers, json=story_payload)
+        story_response.raise_for_status()
+        story_result = story_response.json()
+        universe = story_result[0]["generated_text"]
+
+        # Générer l'image
+        image_prompt = f"{genre} game with {ambiance} ambiance. Keywords: {selected_keywords}. References: {selected_references}."
+        image_headers = {
+            "Authorization": f"Bearer {settings.HUGGINGFACE_API_KEY}",
+            "Content-Type": "multipart/form-data",
+            "Accept": "image/*",
+        }
+        image_payload = {"prompt": image_prompt}
+
+        # Appel à l'API pour l'image
+        image_response = requests.post(
+            settings.IMAGE_GEN_ENDPOINT,
+            headers=image_headers,
+            data=image_payload
+        )
+        image_response.raise_for_status()
+        image_bytes = image_response.content
+
+        # Sauvegarder l'image
+        image_file = ContentFile(image_bytes, "generated_image.png")
+
+        # Créer le jeu
+        game = Game.objects.create(
+            owner=request.user,
+            title=generated_title,
+            genre=genre,
+            ambiance=ambiance,
+            keywords=selected_keywords,
+            references=selected_references,
+            universe=universe,
+            story=universe,  # Utiliser le contenu généré comme histoire
+            image_environment=image_file
+        )
+
+        return render(request, 'games/generation_success.html', {'game': game})
+
+    except requests.exceptions.RequestException as e:
+        return render(request, 'games/create_game.html', {'error': f"Erreur API : {str(e)}"})
+    except Exception as e:
+        return render(request, 'games/create_game.html', {'error': f"Erreur : {str(e)}"})

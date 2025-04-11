@@ -11,4 +11,6 @@ urlpatterns = [
     path('', views.list_games, name='dashboard'),  # Tableau de bord
     path('create/', views.guided_creation_view, name='guided_creation'),  # Création guidée
     path('<int:game_id>/', views.game_detail, name='game-detail'),  # Détail d'un jeu
+    path('random/', views.random_game_view, name='random_game'),  # Nouvelle URL pour Exploration Libre
+
 ]

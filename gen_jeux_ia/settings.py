@@ -47,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'users.middleware.LoginRequiredMiddleware',
+    'games.middleware.ProjectOwnershipMiddleware',
 ]
 
 ROOT_URLCONF = 'gen_jeux_ia.urls'
