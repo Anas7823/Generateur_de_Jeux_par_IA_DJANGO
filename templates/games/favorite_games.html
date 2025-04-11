@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Mes Jeux Favoris{% endblock %}
+{% block content %}
+<div class="favorites-container">
+    <h2>⭐ Mes Jeux Favoris</h2>
+    {% if games %}
+        <ul class="game-list">
+            {% for game in games %}
+                <li class="game-card">
+                    <a href="{% url 'game-detail' game.id %}">
+                        <h3>{{ game.title }}</h3>
+                        {% if game.image_environment %}
+                            <img src="{{ game.image_environment.url }}" alt="Image du jeu">
+                        {% endif %}
+                        <p><strong>Genre :</strong> {{ game.genre }}</p>
+                        <p><strong>Ambiance :</strong> {{ game.ambiance }}</p>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Vous n'avez pas encore de jeux favoris.</p>
+    {% endif %}
+</div>
+{% endblock %}

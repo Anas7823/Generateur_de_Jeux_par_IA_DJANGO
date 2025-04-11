@@ -5,6 +5,7 @@ User = get_user_model()
 
 class Game(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games')
+    favorites = models.ManyToManyField(User, related_name='favorite_games', blank=True)
     title = models.CharField(max_length=100)
     title = models.TextField()
     genre = models.CharField(max_length=50)
@@ -19,6 +20,14 @@ class Game(models.Model):
 
     def __str__(self):
         return self.title
+
+    def toggle_favorite(self, user):
+        if user in self.favorites.all():
+            self.favorites.remove(user)
+            return False
+        else:
+            self.favorites.add(user)
+            return True
 
 class Character(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='characters')

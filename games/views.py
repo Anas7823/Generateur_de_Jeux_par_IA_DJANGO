@@ -11,7 +11,9 @@ from transformers import pipeline
 from diffusers import DiffusionPipeline
 import random
 from .api_limiter import api_limiter  # Ajouter cette ligne en haut du fichier
-
+from django.http import JsonResponse
+from django.shortcuts import redirect
+ 
 
 # API Views
 
@@ -347,3 +349,31 @@ Crée une histoire structurée avec :
         return render(request, 'games/create_game.html', {'error': f"Erreur API : {str(e)}"})
     except Exception as e:
         return render(request, 'games/create_game.html', {'error': f"Erreur : {str(e)}"})
+    
+    
+@login_required
+def toggle_favorite(request, game_id):
+    try:
+        game = get_object_or_404(Game, pk=game_id)
+        is_favorite = game.toggle_favorite(request.user)
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'success',
+                'is_favorite': is_favorite,
+                'count': game.favorites.count()
+            })
+        
+        return redirect('game-detail', game_id=game_id)
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+        return redirect('game-detail', game_id=game_id)
+
+@login_required
+def favorite_games(request):
+    favorite_games = request.user.favorite_games.all()
+    return render(request, 'games/favorite_games.html', {'games': favorite_games})
